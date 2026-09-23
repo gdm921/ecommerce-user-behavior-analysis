@@ -13,4 +13,4 @@ SELECT
 FROM online_retail
 WHERE quantity > 0 AND unit_price > 0
 GROUP BY DATE(invoice_date)
-ORDER BY '日期';
+ORDER BY 'se日期';
