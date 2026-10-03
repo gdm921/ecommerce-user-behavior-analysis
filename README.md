@@ -6,7 +6,7 @@
 ## 技术栈
 - 数据库：MySQL 8.0
 - 数据分析：Python 3.11 + pandas
-- 可视化：Streamlit（待完成）
+- 可视化：Streamlit
 - 版本管理：Git + GitHub
 
 ## 数据集
@@ -61,6 +61,39 @@ ecommerce-user-behavior-analysis/
 1. 克隆仓库：`git clone git@github.com:gdm921/ecommerce-user-behavior-analysis.git`
 2. 导入数据到 MySQL
 3. 执行 sql/ 目录下的 SQL 文件
+
+## 接入火山方舟（豆包）大模型 API
+
+项目通过火山方舟的 OpenAI 兼容接口接入大模型（国内直连，无需代理/海外账号）。
+
+### 接入步骤
+
+1. **注册并开通**：火山引擎官网（volcengine.com）注册账号，进入「火山方舟」控制台并开通服务。
+2. **开通模型**：在方舟控制台「模型广场」找到要用的模型（如 Doubao-Seed-2.1-Pro），点击开通。
+3. **创建 API Key**：控制台「API Key 管理」→ 创建并复制 Key。
+4. **配置密钥**：复制 `.env` 文件，填入 `ARK_API_KEY`（`.env` 已被 .gitignore 忽略，不会上传 GitHub）：
+   ```
+   ARK_API_KEY=你的key
+   ARK_MODEL=doubao-seed-2-1-pro-260915
+   ```
+5. **安装依赖并测试**：
+   ```bash
+   pip install -r requirements.txt
+   python test_llm.py
+   ```
+
+### 代码使用
+
+```python
+from llm_client import chat
+
+reply = chat("帮我分析一下复购率数据")
+print(reply)
+```
+
+- `llm_client.py` 封装了火山方舟 OpenAI 兼容客户端（base_url: `https://ark.cn-beijing.volces.com/api/v3`）
+- 模型 ID 可在 `.env` 的 `ARK_MODEL` 中随时更换（方舟控制台模型广场查看，或用接入点 ID `ep-xxx`）
+- 与官方 OpenAI SDK 用法一致，后续如需换回 OpenAI 或其他兼容服务，只改 `BASE_URL` 和 Key 即可
 
 ## 后续规划
 - [ ] 使用 pandas 进行数据可视化

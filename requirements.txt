@@ -7,3 +7,5 @@ streamlit
 sqlalchemy
 pymysql
 jupyter
+openai
+python-dotenv

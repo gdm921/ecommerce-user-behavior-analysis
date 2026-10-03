@@ -1,6 +1,13 @@
+import sys
+import os
+
+# 把项目根目录加入模块搜索路径，才能 import 到根目录的 llm_client / nl2sql
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import streamlit as st
 import pandas as pd
 import pymysql
+from nl2sql import ask_to_sql
 
 st.title("电商数据分析看板")
 
@@ -69,3 +76,26 @@ LIMIT 10
 """
 country_df = pd.read_sql(country_sql, conn)
 st.bar_chart(country_df.set_index('country')['sales'])
+
+# ===== AI 数据分析师（自然语言查数据）=====
+st.header("AI 数据分析师")
+question = st.text_input("用中文提问，比如：哪个国家的销售额最高？", "")
+if st.button("AI 查询"):
+    if not question.strip():
+        st.warning("请输入问题")
+    else:
+        with st.spinner("AI 正在生成 SQL..."):
+            try:
+                sql = ask_to_sql(question)
+            except Exception as e:
+                st.error(f"AI 调用失败：{e}")
+                st.stop()
+        st.code(sql, language="sql")
+        try:
+            result = pd.read_sql(sql, conn)
+        except Exception as e:
+            st.error(f"SQL 执行失败：{e}，换个问法试试")
+            st.stop()
+        st.dataframe(result)
+        if len(result.columns) >= 2:
+            st.bar_chart(result.set_index(result.columns[0])[result.columns[1]])
